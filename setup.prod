@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+heroku config:get FIREBASE_API_KEY -s > .env -a cars-web-api-production &&
+heroku config:get FIREBASE_AUTH_DOMAIN -s >> .env -a cars-web-api-production &&
+heroku config:get FIREBASE_CREDENTIAL_CERT -s >> .env -a cars-web-api-production &&
+heroku config:get FIREBASE_DATABASE_URL -s >> .env -a cars-web-api-production &&
+heroku config:get FIREBASE_PROJECT_ID -s >> .env -a cars-web-api-production &&
+heroku config:get SECRET -s >> .env -a cars-web-api-production &&
+heroku config:get SENTRY_DSN -s >> .env -a cars-web-api-production &&
+heroku config:get AD_FTP_FOLDER -s >> .env -a cars-web-api-production &&
+heroku config:get AD_FTP_HOST -s >> .env -a cars-web-api-production &&
+heroku config:get AD_FTP_USER -s >> .env -a cars-web-api-production &&
+heroku config:get AD_FTP_PASSWORD -s >> .env -a cars-web-api-production &&
+heroku config:get S3_ACCESS_KEY_ID -s >> .env -a cars-web-api-production &&
+heroku config:get S3_BUCKET_NAME -s >> .env -a cars-web-api-production &&
+heroku config:get S3_REGION -s >> .env -a cars-web-api-production &&
+heroku config:get S3_SECRET_ACCESS_KEY -s >> .env -a cars-web-api-production &&
+heroku config:get DATABASE_URL -s >> .env -a cars-web-api-production &&
+heroku config:get BLOWERIO_URL -s >> .env -a cars-web-api-production &&
+heroku config:get AWS_EMAIL_SMTP -s >> .env -a cars-web-api-production &&
+heroku config:get AWS_EMAIL_USERNAME -s >> .env -a cars-web-api-production &&
+heroku config:get AWS_EMAIL_PASSWORD -s >> .env -a cars-web-api-production &&
+echo NODE_ENV=dev >> .env

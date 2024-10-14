@@ -1,0 +1,53 @@
+const Joi = require('joi')
+
+const HistorySchema = {
+  onCreate: Joi.object().keys({
+    customer_phone: Joi.string().allow('').optional(),
+    has_history: Joi.boolean().optional().default(false),
+    has_xtra: Joi.boolean().optional().default(false),
+    history: Joi.object().keys({
+      dist: Joi.string().allow('').optional(),
+      has_history: Joi.boolean().optional().default(false),
+      invoice_date: Joi.date().iso().allow('').optional(),
+      invoice_no: Joi.string().allow('').optional(),
+      mechanic: Joi.string().allow('').optional(),
+      mileage: Joi.string().allow('').optional(),
+      order_type: Joi.string().allow('').optional(),
+      signature: Joi.string().allow('').optional(),
+      status: Joi.boolean().optional().default(false),
+      text: Joi.array().items(Joi.string()).optional(),
+    }),
+    mob_expiry_date: Joi.date().iso().allow('').optional(),
+    next_pkk_service: Joi.date().iso().allow('').optional(),
+    next_service_date: Joi.date().iso().allow('').optional(),
+    next_work_date: Joi.date().iso().allow('').optional(),
+    regno: Joi.string().required(),
+    workshop_name: Joi.string().required(),
+    xtra: Joi.object().keys({
+      comment: Joi.string().optional().allow(''),
+      p10: Joi.string().optional().allow(''),
+      p11: Joi.string().optional().allow(''),
+      p12: Joi.string().optional().allow(''),
+      p13: Joi.string().optional().allow(''),
+      p14: Joi.string().optional().allow(''),
+      p15: Joi.string().optional().allow(''),
+      p16: Joi.string().optional().allow(''),
+      p17: Joi.string().optional().allow(''),
+      p18: Joi.string().optional().allow(''),
+      p19: Joi.string().optional().allow(''),
+      p20: Joi.string().optional().allow(''),
+      p21: Joi.string().optional().allow(''),
+      p22: Joi.string().optional().allow(''),
+      p23: Joi.string().optional().allow(''),
+      p24: Joi.string().optional().allow(''),
+      p25: Joi.string().optional().allow(''),
+      p26: Joi.string().optional().allow(''),
+      p27: Joi.string().optional().allow(''),
+      p28: Joi.string().optional().allow(''),
+      p29: Joi.string().optional().allow(''),
+      p30: Joi.string().optional().allow(''),
+    }),
+  }),
+}
+
+module.exports = HistorySchema

@@ -1,0 +1,6 @@
+module.exports = {
+  API: 'API',
+  SUPERUSER: 'SUPERUSER',
+  WORKSHOP: 'WORKSHOP',
+  BILXTRA_WEB: 'BILXTRA_WEB',
+}

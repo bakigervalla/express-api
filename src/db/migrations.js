@@ -1,0 +1,267 @@
+module.exports = `
+      CREATE TABLE IF NOT EXISTS wholesaler(
+        WHOLESALER_ID SERIAL PRIMARY KEY NOT NULL,
+        NAME TEXT NOT NULL,
+        WHOLESALE_NUMBER INT,
+        ACTIVE BOOLEAN
+      );
+      CREATE TABLE IF NOT EXISTS workshops(
+        WORKSHOP_ID SERIAL PRIMARY KEY NOT NULL,
+        DIST TEXT,
+        NAME TEXT NOT NULL,
+        SLUG TEXT NOT NULL,
+        STREET TEXT,
+        ZIP TEXT,
+        CITY TEXT,
+        COUNTY TEXT,
+        LAT DECIMAL,
+        LONG DECIMAL,
+        EMAIL TEXT,
+        PHONE TEXT,
+        FACEBOOK TEXT,
+        HOMEPAGE TEXT,
+        FREE_TEXT TEXT,
+        ACTIVE BOOLEAN,
+        CUSTOMER_NUMBER INT,
+        WORKSHOP_NUMBER INT,
+        WHOLESALER_ID INT REFERENCES wholesaler(wholesaler_id)
+      );
+      ALTER TABLE workshops ADD COLUMN IF NOT EXISTS OPENING_HOURS JSON;
+      CREATE INDEX IF NOT EXISTS workshops_dist_idx ON workshops (dist);
+      CREATE TABLE IF NOT EXISTS app(
+        APP_ID SERIAL PRIMARY KEY NOT NULL,
+        NAME TEXT NOT NULL,
+        ACTIVE BOOLEAN
+      );
+      CREATE TABLE IF NOT EXISTS workshop_app(
+        WORKSHOP_ID INT REFERENCES workshops (workshop_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        APP_ID INT REFERENCES app (app_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        CONSTRAINT workshop_app_pkey PRIMARY KEY (workshop_id, app_id)
+      );
+      CREATE TABLE IF NOT EXISTS wholesale_app(
+        WHOLESALER_ID INT REFERENCES wholesaler (wholesaler_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        APP_ID INT REFERENCES app (app_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        CONSTRAINT wholesaler_app_pkey PRIMARY KEY (wholesaler_id, app_id)
+      );
+      CREATE TABLE IF NOT EXISTS workshop_images(
+        IMAGE_ID SERIAL PRIMARY KEY NOT NULL,
+        IMAGE_URL TEXT NOT NULL,
+        WORKSHOP_ID INT REFERENCES workshops(workshop_id) ON UPDATE CASCADE ON DELETE CASCADE
+      );
+      CREATE TABLE IF NOT EXISTS weborder(
+        WEBORDER_ID SERIAL PRIMARY KEY NOT NULL,
+        WORKSHOP_ID INT REFERENCES workshops (workshop_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FIRST_NAME TEXT NOT NULL,
+        MIDDLE_NAME TEXT,
+        LAST_NAME TEXT NOT NULL,
+        PHONE TEXT NOT NULL,
+        EMAIL TEXT,
+        REGNO TEXT NOT NULL,
+        STREET TEXT NOT NULL,
+        HOUSENR INT NOT NULL,
+        ZIP TEXT NOT NULL,
+        CITY TEXT NOT NULL,
+        ORDER_TYPE_NAME TEXT NOT NULL,
+        ORDER_TYPE_DURATION INT NOT NULL,
+        REQUEST TEXT NOT NULL,
+        MESSAGE TEXT NOT NULL,
+        FETCHED BOOLEAN,
+        CREATED_AT TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+      ALTER TABLE weborder DROP COLUMN IF EXISTS housenr;
+      ALTER TABLE weborder ADD COLUMN IF NOT EXISTS DELIVERY VARCHAR(10) NOT NULL DEFAULT 'cars';
+      CREATE TABLE IF NOT EXISTS vehicle_history(
+        HISTORY_ID SERIAL PRIMARY KEY NOT NULL,
+        TEXT TEXT,
+        DIST TEXT NOT NULL,
+        INVOICE_DATE TIMESTAMP NOT NULL,
+        INVOICE_NO TEXT,
+        MECHANIC TEXT,
+        MILEAGE TEXT,
+        ORDER_TYPE TEXT,
+        SIGNATURE TEXT,
+        REGNO TEXT NOT NULL,
+        CUSTOMER_PHONE TEXT NOT NULL,
+        WORKSHOP_NAME TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_vehicle_history_customer_phone ON vehicle_history(CUSTOMER_PHONE);
+      CREATE TABLE IF NOT EXISTS vehicle(
+        REGNO TEXT PRIMARY KEY NOT NULL,
+        MOB_EXPIRY_DATE TIMESTAMP DEFAULT NULL,
+        NEXT_PKK_SERVICE TIMESTAMP DEFAULT NULL,
+        NEXT_SERVICE_DATE TIMESTAMP DEFAULT NULL,
+        NEXT_WORK_DATE TIMESTAMP DEFAULT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_vehicle_regno ON vehicle_history(REGNO);
+      CREATE TABLE IF NOT EXISTS xtra(
+        XTRA_ID SERIAL PRIMARY KEY NOT NULL,
+        COMMENT TEXT,
+        P10 TEXT,
+        P11 TEXT,
+        P12 TEXT,
+        P13 TEXT,
+        P14 TEXT,
+        P15 TEXT,
+        P16 TEXT,
+        P17 TEXT,
+        P18 TEXT,
+        P19 TEXT,
+        P20 TEXT,
+        P21 TEXT,
+        P22 TEXT,
+        P23 TEXT,
+        P24 TEXT,
+        P25 TEXT,
+        P26 TEXT,
+        P27 TEXT,
+        P28 TEXT,
+        P29 TEXT,
+        P30 TEXT,
+        REGNO TEXT REFERENCES vehicle (regno) ON UPDATE CASCADE ON DELETE CASCADE,
+        CUSTOMER_PHONE TEXT,
+        CREATED_AT TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS vehicle_history(
+        HISTORY_ID SERIAL PRIMARY KEY NOT NULL,
+        TEXT TEXT,
+        DIST TEXT,
+        INVOICE_DATE TIMESTAMP,
+        INVOICE_NO TEXT,
+        MECHANIC TEXT,
+        MILEAGE TEXT,
+        ORDER_TYPE TEXT,
+        SIGNATURE TEXT,
+        REGNO TEXT NOT NULL,
+        CUSTOMER_PHONE TEXT,
+        WORKSHOP_NAME TEXT
+      );
+      CREATE TABLE IF NOT EXISTS workshop_meta(
+        META_ID SERIAL PRIMARY KEY NOT NULL,
+        TITLE TEXT,
+        WORKSHOP_ID INT REFERENCES workshops(workshop_id) ON UPDATE CASCADE ON DELETE CASCADE
+      );
+      CREATE TABLE IF NOT EXISTS users(
+        USER_ID SERIAL PRIMARY KEY NOT NULL,
+        USERNAME TEXT UNIQUE NOT NULL,
+        PHONE_NUMBER TEXT NOT NULL,
+        PASSWORD TEXT NOT NULL,
+        ROLE TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS ad_item_order(
+        ORDER_ID SERIAL PRIMARY KEY NOT NULL,
+        WHOLESALE_ID INT REFERENCES wholesaler(wholesaler_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        WORKSHOP_ID INT REFERENCES workshops(workshop_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        APP_ID INT REFERENCES app(app_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        CREATED_AT TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS ad_item(
+        ITEM_ID SERIAL PRIMARY KEY NOT NULL,
+        WHOLESALE_ID INT REFERENCES wholesaler(wholesaler_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        ARTICLE_NUMBER_WITH_ALPHA TEXT NOT NULL,
+        DESCRIPTION TEXT,
+        TAX DECIMAL,
+        PRICE DECIMAL,
+        BARCODE TEXT,
+        ARTICLE_NUMBER TEXT NOT NULL
+      );
+      ALTER TABLE ad_item ALTER COLUMN ARTICLE_NUMBER_WITH_ALPHA DROP NOT NULL;
+      ALTER TABLE ad_item ALTER COLUMN ARTICLE_NUMBER DROP NOT NULL;
+      CREATE TABLE IF NOT EXISTS app_setting(
+        APP_SETTING_ID SERIAL PRIMARY KEY NOT NULL,
+        APP_ID INT REFERENCES app(app_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        KEY TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS app_setting_workshop(
+        APP_SETTING_ID INT REFERENCES app_setting(app_setting_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        WORKSHOP_ID INT REFERENCES workshops(workshop_id) ON UPDATE CASCADE ON DELETE CASCADE,
+        VALUE TEXT
+      );
+        CREATE TABLE IF NOT EXISTS info(
+            ORDER_ID INT NOT NULL,
+            UUID VARCHAR(50) NOT NULL,
+            CREATED TIMESTAMP NOT NULL DEFAULT NOW(),
+            EXPIRES TIMESTAMP NOT NULL,
+            REGID VARCHAR(10) NOT NULL,
+            SENAME VARCHAR(100) NOT NULL,
+            SEPHONE VARCHAR(50) NOT NULL,
+            CUNAME VARCHAR(100) NOT NULL,
+            CUMOBILE VARCHAR(50) NOT NULL,
+            RESULT INT [],
+            ORDERS INT [],
+            BOOKED TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS consent(
+            UUID VARCHAR(50) NOT NULL,
+            CUMOBILE VARCHAR(50) NOT NULL,
+            CUNAME VARCHAR(50) NOT NULL,
+            CUNO VARCHAR(50) NOT NULL,
+            DIST VARCHAR(10) NOT NULL,
+            SENAME VARCHAR(50) NOT NULL,
+            SEPHONE VARCHAR(50) NOT NULL,
+            CREATED TIMESTAMP NOT NULL DEFAULT NOW(),
+            FETCHED BOOLEAN DEFAULT false,
+            ANSWERED TIMESTAMP,
+            MARKET_INFO_SMS BOOLEAN DEFAULT false,
+            MARKET_INFO_MAIL BOOLEAN DEFAULT false,
+            REMINDER_SMS BOOLEAN DEFAULT false,
+            REMINDER_MAIL BOOLEAN DEFAULT false,
+            SERVICE_SMS BOOLEAN DEFAULT false,
+            SERVICE_MAIL BOOLEAN DEFAULT false
+        );
+        CREATE TABLE IF NOT EXISTS notice(
+            UUID VARCHAR(50) NOT NULL,
+            CUNAME VARCHAR(50) NOT NULL,
+            CUMOBILE VARCHAR(50) NOT NULL,
+            PICTURE_ID VARCHAR(5) NOT NULL,
+            REGID VARCHAR(10) NOT NULL,
+            NEW_REGID VARCHAR(10),
+            SENAME VARCHAR(100) NOT NULL,
+            SEPHONE VARCHAR(10) NOT NULL,
+            TEXT TEXT,
+            CREATED TIMESTAMP NOT NULL DEFAULT NOW(),
+            UPDATED TIMESTAMP,
+            SOLD BOOLEAN DEFAULT false
+        );
+        CREATE TABLE IF NOT EXISTS quote(
+            UUID VARCHAR(50) NOT NULL,
+            ORDER_ID VARCHAR(50) NOT NULL,
+            REGID VARCHAR(10) NOT NULL,
+            SENAME VARCHAR(100) NOT NULL,
+            SEPHONE VARCHAR(10) NOT NULL,
+            CUNAME VARCHAR(100) NOT NULL,
+            CUPHONE VARCHAR(10) NOT NULL,
+            TEXT TEXT,
+            AMOUNT DECIMAL NOT NULL,
+            DURATION INT NOT NULL,
+            CREATED TIMESTAMP NOT NULL DEFAULT NOW(),
+            STATUS INT NOT NULL,
+            EXPIRES TIMESTAMP,
+            BOOKED TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS vehicle_settings(
+            UUID VARCHAR(50) NOT NULL,
+            REGNO VARCHAR(50) REFERENCES vehicle (regno) ON UPDATE CASCADE ON DELETE CASCADE,
+            PHONE VARCHAR(50) NOT NULL,
+            ACTIVE BOOLEAN DEFAULT TRUE,
+            DESCRIPTION TEXT
+        );
+        CREATE TABLE IF NOT EXISTS collection_pages(
+            PAGE_ID SERIAL PRIMARY KEY NOT NULL,
+            NAME VARCHAR(100) NOT NULL UNIQUE,
+            TYPE VARCHAR(100)
+        );
+        ALTER TABLE collection_pages DROP COLUMN IF EXISTS type;
+        ALTER TABLE collection_pages ADD COLUMN IF NOT EXISTS parent_id INT REFERENCES collection_pages(page_id);
+        ALTER TABLE workshops ADD COLUMN IF NOT EXISTS AFFILIATION INT REFERENCES collection_pages(page_id);
+        CREATE TABLE IF NOT EXISTS collection_pages_workshops(
+            ID SERIAL PRIMARY KEY NOT NULL,
+            PAGE_ID INT REFERENCES collection_pages (page_id) ON UPDATE CASCADE ON DELETE CASCADE,
+            WORKSHOP_ID INT REFERENCES workshops (workshop_id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS collection_page_parent_id_idx ON collection_pages (parent_id);
+        ALTER TABLE ad_item ADD COLUMN IF NOT EXISTS article_number_search TEXT NOT NULL DEFAULT '';
+        ALTER TABLE ad_item ADD COLUMN IF NOT EXISTS replacement_product TEXT;
+        ALTER TABLE collection_pages ADD COLUMN IF NOT EXISTS hidden BOOLEAN DEFAULT false;
+        ALTER TABLE vehicle_history ADD COLUMN IF NOT EXISTS duplicate BOOLEAN DEFAULT false;
+        CREATE INDEX IF NOT EXISTS vehicle_history_invoice_no_idx ON vehicle_history (invoice_no);
+    `

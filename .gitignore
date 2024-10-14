@@ -1,0 +1,14 @@
+node_modules
+.DS_Store
+*.log
+*.error
+dist
+docs
+.webpack
+.idea/
+build
+dump-dir/
+.env
+.env-local
+.env-*
+temp_*
